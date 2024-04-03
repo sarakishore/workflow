@@ -1,46 +1,49 @@
-name: Manual Approval Pipeline
+name: User Approval Workflow
 
 on:
-  workflow_dispatch:  # Triggered manually
+  push:
+    branches:
+      - main
 
 jobs:
-  build:
-    runs-on: self-hosted
+  stage-1-echo:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
-      - name: Build
-        run: echo "Building application..."
+      - name: Echo Stage 1
+        run: echo "Stage 1"
 
-  test:
-    runs-on: self-hosted
-    needs: build
+  stage-2-echo:
+    needs: stage-1-echo
+    runs-on: ubuntu-latest
     steps:
-      - name: Run tests
-        run: echo "Running tests..."
+      - name: Echo Stage 2
+        run: echo "Stage 2"
 
-  deploy_to_staging:
-    runs-on: self-hosted
-    needs: test
+  stage-3-create-user:
+    needs: stage-2-echo
+    runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Staging
-        run: echo "Deploying to Staging..."
+      - name: Create User
+        run: |
+          # Script to create user
+          # Assuming it's a placeholder
 
-  approve_staging:
-    runs-on: self-hosted
-    needs: deploy_to_staging
-    if: github.event_name == 'workflow_dispatch'
+  stage-4-reject:
+    if: failure()
+    needs: stage-3-create-user
+    runs-on: ubuntu-latest
     steps:
-      - name: Manual approval for Staging
-        run: echo "Please manually approve staging deployment."
+      - name: Reject User
+        run: |
+          # Script to reject user
+          # Assuming it's a placeholder
 
-  deploy_to_production:
-    runs-on: self-hosted
-    needs: [approve_staging, test]
-    environment:
-      name: production
-      url: https://github.com/sarakishore
+  stage-5-approve:
+    if: success()
+    needs: stage-3-create-user
+    runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Production
-        run: echo "Deploying to Production..."
+      - name: Approve User
+        run: |
+          # Script to approve user
+          # Assuming it's a placeholder
