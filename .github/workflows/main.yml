@@ -1,4 +1,4 @@
-name: User Approval Workflow
+name: Manual Approval Pipeline
 
 on:
   push:
@@ -6,60 +6,64 @@ on:
       - main
 
 jobs:
-  stage-1-echo:
-    runs-on: Self-hosted
+  build:
+    runs-on: ubuntu-latest
     steps:
-      - name: Echo Stage 1
-        run: echo "Stage 1"
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Build
+        run: echo "Building application..."
 
-  stage-2-echo:
-    needs: stage-1-echo
-    runs-on: Self-hosted
+  test:
+    runs-on: ubuntu-latest
+    needs: build
     steps:
-      - name: Echo Stage 2
-        run: echo "Stage 2"
+      - name: Run tests
+        run: echo "Running tests..."
 
-  stage-3-create-user:
-    runs-on: Self-hosted
-    needs: stage-2-echo
+  deploy_to_staging:
+    runs-on: ubuntu-latest
+    needs: test
     steps:
-      - name: Create User
-        run: |
-          # Script to create user
-          # Assuming it's a placeholder
+      - name: Deploy to Staging
+        run: echo "Deploying to Staging..."
 
-  manual-approval:
-    runs-on: Self-hosted
-    needs: stage-3-create-user
-    outputs:
-      approval_status: ${{ steps.approval.outputs.approval_status }}
+  approve_staging:
+    runs-on: ubuntu-latest
+    needs: deploy_to_staging
+    if: github.event_name == 'pull_request'
     steps:
-      - name: Manual Approval
-        id: approval
-        run: echo "Please approve or reject user creation."
-      - name: Set Approval Output
-        if: steps.approval.outputs.return-value == 'approve'
-        run: echo "::set-output name=approval_status::true"
-      - name: Set Rejection Output
-        if: steps.approval.outputs.return-value == 'reject'
-        run: echo "::set-output name=approval_status::false"
+      - name: Request approval for Staging
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: pullRequest } = await github.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number
+            });
 
-  stage-4-reject:
-    if: ${{ needs.manual-approval.outputs.approval_status == 'false' }}
-    runs-on: Self-hosted
-    needs: manual-approval
-    steps:
-      - name: Reject User
-        run: |
-          # Script to reject user
-          # Assuming it's a placeholder
+            const reviewers = ["username1", "username2"]; // Add your reviewers
+            const approvers = pullRequest.requested_reviewers.map(reviewer => reviewer.login);
+            const needsApproval = reviewers.some(reviewer => !approvers.includes(reviewer));
 
-  stage-5-approve:
-    if: ${{ needs.manual-approval.outputs.approval_status == 'true' }}
-    runs-on: Self-hosted
-    needs: manual-approval
+            if (needsApproval) {
+              await github.pulls.requestReviewers({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                reviewers: reviewers
+              });
+            }
+
+  deploy_to_production:
+    runs-on: ubuntu-latest
+    needs: [approve_staging, test]
+    environment:
+      name: production
+      url: https://example.com
     steps:
-      - name: Approve User
-        run: |
-          # Script to approve user
-          # Assuming it's a placeholder
+      - name: Deploy to Production
+        run: echo "Deploying to Production..."
