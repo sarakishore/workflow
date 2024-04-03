@@ -37,11 +37,11 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           args: |
-            --token=${{ secrets.GITHUB_TOKEN }}
+            --token= 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
             --yes
             --publish
-            --repo=$GITHUB_REPOSITORY
-            --tag=v$VERSION
+            --repo= workflow
+            --tag= 1.0.1
             --title="Manual Approval"
 
   stage-4-reject:
