@@ -34,7 +34,6 @@ jobs:
     if: always()
     steps:
       - name: Manual Approval
-        uses: "marvinpinto/action-automatic-releases@latest"
         with:
           args: |
             --token= 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
