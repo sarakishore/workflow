@@ -39,15 +39,15 @@ jobs:
         run: echo "Please approve or reject user creation."
       - name: Set Approval Output
         if: steps.approval.outputs.return-value == 'approve'
-        run: echo "::set-output name=approval_status::approve"
+        run: echo "::set-output name=approval_status::true"
       - name: Set Rejection Output
         if: steps.approval.outputs.return-value == 'reject'
-        run: echo "::set-output name=approval_status::reject"
+        run: echo "::set-output name=approval_status::false"
 
   stage-4-reject:
-    if: ${{ needs.manual-approval.outputs.approval_status == 'reject' }}
-    needs: manual-approval
+    if: ${{ needs.manual-approval.outputs.approval_status == 'false' }}
     runs-on: ubuntu-latest
+    needs: manual-approval
     steps:
       - name: Reject User
         run: |
@@ -55,9 +55,9 @@ jobs:
           # Assuming it's a placeholder
 
   stage-5-approve:
-    if: ${{ needs.manual-approval.outputs.approval_status == 'approve' }}
-    needs: manual-approval
+    if: ${{ needs.manual-approval.outputs.approval_status == 'true' }}
     runs-on: ubuntu-latest
+    needs: manual-approval
     steps:
       - name: Approve User
         run: |
