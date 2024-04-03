@@ -29,9 +29,6 @@ jobs:
       - name: Create User
         id: create-user
         run: |
-          # Your actual user creation logic here
-          # For example:
-          # curl -X POST https://api.example.com/users -d "name=John&email=john@example.com"
           echo "User creation logic here"
         continue-on-error: true
 
