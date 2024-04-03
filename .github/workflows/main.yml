@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -16,21 +16,21 @@ jobs:
         run: echo "Building application..."
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build
     steps:
       - name: Run tests
         run: echo "Running tests..."
 
   deploy_to_staging:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: test
     steps:
       - name: Deploy to Staging
         run: echo "Deploying to Staging..."
 
   approve_staging:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: deploy_to_staging
     if: github.event_name == 'pull_request'
     steps:
@@ -59,11 +59,11 @@ jobs:
             }
 
   deploy_to_production:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [approve_staging, test]
     environment:
       name: production
-      url: https://example.com
+      url: https://github.com/sarakishore
     steps:
       - name: Deploy to Production
         run: echo "Deploying to Production..."
