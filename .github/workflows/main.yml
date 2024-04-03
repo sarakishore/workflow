@@ -52,14 +52,22 @@ jobs:
           # Instructions to the approver
           echo "Please approve or reject the user manually."
 
-      - name: Handle Approval Decision
-        if: steps.approval.outputs.result == 'approve'
+  stage-6-handle-approval:
+    if: success() && github.event_name == 'workflow_dispatch' && steps.approval.outputs.result == 'approve'
+    needs: stage-5-approve
+    runs-on: ubuntu-latest
+    steps:
+      - name: Handle Approval
         run: |
-          # Script to approve user
+          # Script to handle approval
           # Assuming it's a placeholder
 
-      - name: Handle Rejection Decision
-        if: steps.approval.outputs.result == 'reject'
+  stage-7-handle-rejection:
+    if: success() && github.event_name == 'workflow_dispatch' && steps.approval.outputs.result == 'reject'
+    needs: stage-5-approve
+    runs-on: ubuntu-latest
+    steps:
+      - name: Handle Rejection
         run: |
-          # Script to reject user
+          # Script to handle rejection
           # Assuming it's a placeholder
