@@ -35,6 +35,7 @@ jobs:
     steps:
       - name: Manual Approval
         with:
+          uses: "sarakishore/workflow@latest"
           args: |
             --token= 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
             --yes
