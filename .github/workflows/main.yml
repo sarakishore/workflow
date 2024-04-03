@@ -1,9 +1,7 @@
 name: Manual Approval Pipeline
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -32,31 +30,10 @@ jobs:
   approve_staging:
     runs-on: self-hosted
     needs: deploy_to_staging
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'workflow_dispatch'
     steps:
-      - name: Request approval for Staging
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { data: pullRequest } = await github.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number
-            });
-
-            const reviewers = ["sarakishore", "ashoklogicfocus"]; // Add your reviewers
-            const approvers = pullRequest.requested_reviewers.map(reviewer => reviewer.login);
-            const needsApproval = reviewers.some(reviewer => !approvers.includes(reviewer));
-
-            if (needsApproval) {
-              await github.pulls.requestReviewers({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number,
-                reviewers: reviewers
-              });
-            }
+      - name: Manual approval for Staging
+        run: echo "Please manually approve staging deployment."
 
   deploy_to_production:
     runs-on: self-hosted
