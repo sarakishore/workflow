@@ -47,7 +47,7 @@ jobs:
             }
 
   stage-4-reject:
-    if: failure()
+    if: failure()  # Potential issue here
     needs: [stage-3-create-user, manual-approval]
     runs-on: ubuntu-latest
     steps:
