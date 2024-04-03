@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   stage-1-echo:
@@ -27,52 +26,29 @@ jobs:
       - name: Create User
         run: |
           # Script to create user
-          # Example:
-          echo "Creating user..."
-          # Placeholder for actual user creation logic
-
-  stage-5-approve:
-    if: success() && github.event_name == 'workflow_dispatch'
-    needs: stage-3-create-user
-    runs-on: ubuntu-latest
-    steps:
+          # Assuming it's a placeholder
       - name: Manual Approval
-        id: approval
-        run: |
-          # Prompt for manual approval or rejection
-          # You can use GitHub's manual approval feature here
-          # Instructions to the approver
-          echo "Please approve or reject the user manually."
-
-  stage-6-handle-approval:
-    if: success() && github.event_name == 'workflow_dispatch' && steps.approval.outputs.result == 'approve'
-    needs: stage-5-approve
-    runs-on: ubuntu-latest
-    steps:
-      - name: Handle Approval
-        run: |
-          # Script to handle approval
-          # Example:
-          echo "User approved, further processing..."
-
+        id: approve
+        run: echo "::set-output name=approved::false" # Default is false, change to true if approved manually
+      - name: Check Approval
+        run: echo "Approval status is ${{ steps.approve.outputs.approved }}"
+  
   stage-4-reject:
-    if: failure() && github.event_name == 'workflow_dispatch'
-    needs: [stage-6-handle-approval, stage-5-approve]
+    if: failure()
+    needs: stage-3-create-user
     runs-on: ubuntu-latest
     steps:
       - name: Reject User
         run: |
           # Script to reject user
-          # Example:
-          echo "User rejected, cleaning up..."
+          # Assuming it's a placeholder
 
-  stage-7-handle-rejection:
-    if: success() && github.event_name == 'workflow_dispatch' && steps.approval.outputs.result == 'reject'
-    needs: stage-5-approve
+  stage-5-approve:
+    if: success() && needs.stage-3-create-user.outputs.check-approval == 'true'
+    needs: stage-3-create-user
     runs-on: ubuntu-latest
     steps:
-      - name: Handle Rejection
+      - name: Approve User
         run: |
-          # Script to handle rejection
-          # Example:
-          echo "User rejected, handling rejection..."
+          # Script to approve user
+          # Assuming it's a placeholder
