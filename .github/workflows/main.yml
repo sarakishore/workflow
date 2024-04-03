@@ -1,8 +1,9 @@
 name: User Approval Workflow
+
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   stage-1-echo:
@@ -23,27 +24,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create User
-        id: create-user
         run: |
-          echo "User creation logic here"
-        continue-on-error: true
+          # Script to create user
+          # Assuming it's a placeholder
 
-      - name: Set Approval Flag
-        if: ${{ always() }}
-        run: echo "::set-output name=approve-user::true"
-
-  stage-4-approve:
+  stage-4-reject:
+    if: failure()
     needs: stage-3-create-user
     runs-on: ubuntu-latest
-    if: ${{ needs.stage-3-create-user.outputs.approve-user == 'true' }}
-    steps:
-      - name: Approve User
-        run: echo "User approved"
-
-  stage-5-reject:
-    needs: stage-3-create-user
-    runs-on: ubuntu-latest
-    if: ${{ needs.stage-3-create-user.outputs.approve-user != 'true' }}
     steps:
       - name: Reject User
-        run: echo "User rejected"
+        run: |
+          # Script to reject user
+          # Assuming it's a placeholder
+
+  stage-5-approve:
+    if: success() && github.event_name == 'pull_request'
+    needs: stage-3-create-user
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for approval
+        id: approval
+        uses: azure/wait-for-github-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          checks: |
+            create-user
+      - name: Approve User
+        if: steps.approval.outputs.approved == 'true'
+        run: |
+          # Script to approve user
+          # Assuming it's a placeholder
