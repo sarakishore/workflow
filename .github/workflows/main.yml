@@ -1,53 +1,49 @@
-name: Build and User Approval Workflow
+name: User Approval Workflow
+
 on:
   push:
     branches:
       - main
+
 jobs:
-  build:
+  stage-1-echo:
     runs-on: ubuntu-latest
-    steps:
-      jobs:
-  	stage-1-echo:
-    	runs-on: ubuntu-latest
     steps:
       - name: Echo Stage 1
-        run: echo "Stage 1: Echo"
-jobs:
-  build:
+        run: echo "Stage 1"
+
+  stage-2-echo:
+    needs: stage-1-echo
     runs-on: ubuntu-latest
-    steps:
-      jobs:
-  	stage-2-echo:
-    	runs-on: ubuntu-latest
     steps:
       - name: Echo Stage 2
-        run: echo "Stage 2: Echo"
+        run: echo "Stage 2"
 
-  create-user-and-approve:
+  stage-3-create-user:
+    needs: stage-2-echo
     runs-on: ubuntu-latest
-    needs: build
-    outputs:
-      approved: ${{ steps.approval.outputs.approved }}
     steps:
       - name: Create User
-        run: echo "Creating User"
-      - name: Await Approval
-        id: approval
-        run: echo "::set-output name=approved::true"
-        continue-on-error: true
-  check-approval-and-deploy:
+        run: |
+          # Script to create user
+          # Assuming it's a placeholder
+
+  stage-4-reject:
+    if: failure()
+    needs: stage-3-create-user
     runs-on: ubuntu-latest
-    needs: create-user-and-approve
     steps:
-      - name: Check Approval
-        if: ${{ needs.create-user-and-approve.outputs.approved == 'true' }}
-        run: echo "User Approved"
-        continue-on-error: true
-        id: approved
-      - name: Deploy Application
-        if: steps.approved.outputs.result == 'success'
-        run: echo "Deploying Application"
-      - name: User Not Approved
-        if: steps.approved.outputs.result != 'success'
-        run: echo "User not approved, skipping deployment"
+      - name: Reject User
+        run: |
+          # Script to reject user
+          # Assuming it's a placeholder
+
+  stage-5-approve:
+    if: success()
+    needs: stage-3-create-user
+    runs-on: ubuntu-latest
+    steps:
+      - name: Approve User
+        run: |
+          # Script to approve user
+          # Assuming it's a placeholder
