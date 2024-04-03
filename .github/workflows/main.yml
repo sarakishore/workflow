@@ -44,29 +44,22 @@ jobs:
     needs: stage-3-create-user
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for approval
+      - name: Manual Approval
         id: approval
-        uses: azure/wait-for-github-action@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          checks: |
-            create-user
-      - name: Approve or Reject User
-        if: steps.approval.outputs.approved == 'true'
         run: |
-          # Script to prompt for approval
-          # You can use input from the user here
-          # Assuming it's a placeholder
-        shell: bash
+          # Prompt for manual approval or rejection
+          # You can use GitHub's manual approval feature here
+          # Instructions to the approver
+          echo "Please approve or reject the user manually."
 
-      - name: Approve User
-        if: steps.approval.outputs.approved == 'true' && steps.Approve_or_Reject_User.outputs.result == 'approve'
+      - name: Handle Approval Decision
+        if: steps.approval.outputs.result == 'approve'
         run: |
           # Script to approve user
           # Assuming it's a placeholder
 
-      - name: Reject User
-        if: steps.approval.outputs.approved == 'true' && steps.Approve_or_Reject_User.outputs.result == 'reject'
+      - name: Handle Rejection Decision
+        if: steps.approval.outputs.result == 'reject'
         run: |
           # Script to reject user
           # Assuming it's a placeholder
