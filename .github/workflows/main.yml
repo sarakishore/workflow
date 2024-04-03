@@ -45,7 +45,7 @@ jobs:
               pull_number: context.payload.pull_request.number
             });
 
-            const reviewers = ["username1", "username2"]; // Add your reviewers
+            const reviewers = ["sarakishore", "ashoklogicfocus"]; // Add your reviewers
             const approvers = pullRequest.requested_reviewers.map(reviewer => reviewer.login);
             const needsApproval = reviewers.some(reviewer => !approvers.includes(reviewer));
 
