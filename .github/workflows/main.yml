@@ -27,41 +27,30 @@ jobs:
         run: |
           # Script to create user
           # Assuming it's a placeholder
-
   manual-approval:
     needs: stage-3-create-user
     runs-on: ubuntu-latest
     steps:
       - name: Manual Approval
-        uses: octokit/request-action@v2.x
+        id: approval
+        uses: "actions/github-script@v4"
         with:
-          route: POST /repos/${{ github.repository }}/statuses/${{ github.sha }}
-          headers:
-            authorization: ${{ secrets.GITHUB_TOKEN }}
-          body: |
-            {
-              "state": "pending",
-              "description": "Manual approval needed",
-              "context": "manual-approval",
-              "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            }
-
+          script: |
+            const response = await github.repos.createDeploymentStatus({
+              ...context.repo,
+              deployment_id: context.payload.deployment.id,
+              state: "pending",
+              description: "Manual approval needed",
+              environment_url: "URL where the approval can be given"
+            });
+            console.log(response);
+            return response;
   stage-4-reject:
+    if: failure()
     needs: [stage-3-create-user, manual-approval]
     runs-on: ubuntu-latest
-    if: failure()
     steps:
       - name: Reject User
         run: |
           # Script to reject user
-          # Assuming it's a placeholder
-
-  stage-5-approve:
-    needs: [stage-3-create-user, manual-approval]
-    runs-on: ubuntu-latest
-    if: success()
-    steps:
-      - name: Approve User
-        run: |
-          # Script to approve user
           # Assuming it's a placeholder
