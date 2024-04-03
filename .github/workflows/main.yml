@@ -1,9 +1,8 @@
 name: User Approval Workflow
-
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   stage-1-echo:
@@ -20,36 +19,38 @@ jobs:
         run: echo "Stage 2"
 
   stage-3-create-user:
+    needs: stage-2-echo
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        approve-user: [false]
+      fail-fast: false
     steps:
-      - name: Create User Approval
-        uses: trstringer/manual-approval@v1
-        with:
-          secret: ${{ github.TOKEN }}
-          approvers: user1,user2,org-team1
-          minimum-approvals: 1
-          issue-title: "Deploying v1.3.5 to prod from staging"
-          issue-body: "Please approve or deny the deployment of version v1.3.5."
-          exclude-workflow-initiator-as-approver: false
-          additional-approved-words: ''
-          additional-denied-words: ''
-
-  stage-4-reject:
-    if: failure()
-    needs: stage-3-create-user
-    runs-on: ubuntu-latest
-    steps:
-      - name: Reject User
+      - name: Create User
+        id: create-user
         run: |
-          # Script to reject user
-          # Assuming it's a placeholder
+          # Your actual user creation logic here
+          # For example:
+          # curl -X POST https://api.example.com/users -d "name=John&email=john@example.com"
+          echo "User creation logic here"
+        continue-on-error: true
 
-  stage-5-approve:
-    if: success()
+      - name: Set Approval Flag
+        if: ${{ always() }}
+        run: echo "::set-output name=approve-user::true"
+
+  stage-4-approve:
     needs: stage-3-create-user
     runs-on: ubuntu-latest
+    if: ${{ needs.stage-3-create-user.outputs.approve-user == 'true' }}
     steps:
       - name: Approve User
-        run: |
-          # Script to approve user
-          # Assuming it's a placeholder
+        run: echo "User approved"
+
+  stage-5-reject:
+    needs: stage-3-create-user
+    runs-on: ubuntu-latest
+    if: ${{ needs.stage-3-create-user.outputs.approve-user != 'true' }}
+    steps:
+      - name: Reject User
+        run: echo "User rejected"
