@@ -27,15 +27,19 @@ jobs:
         run: |
           # Script to create user
           # Assuming it's a placeholder
+
+  manual-approval:
+    needs: stage-3-create-user
+    runs-on: ubuntu-latest
+    outputs:
+      approved: ${{ steps.approve.outputs.approved }}
+    steps:
       - name: Manual Approval
         id: approve
-        run: echo "::set-output name=approved::false" # Default is false, change to true if approved manually
-      - name: Check Approval
-        run: echo "Approval status is ${{ steps.approve.outputs.approved }}"
-  
+        run: echo "::set-output name=approved::true" # Change to false to simulate disapproval
+
   stage-4-reject:
-    if: failure()
-    needs: stage-3-create-user
+    if: ${{ needs.manual-approval.outputs.approved == 'false' }}
     runs-on: ubuntu-latest
     steps:
       - name: Reject User
@@ -44,8 +48,7 @@ jobs:
           # Assuming it's a placeholder
 
   stage-5-approve:
-    if: success() && needs.stage-3-create-user.outputs.check-approval == 'true'
-    needs: stage-3-create-user
+    if: ${{ needs.manual-approval.outputs.approved == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Approve User
