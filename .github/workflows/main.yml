@@ -29,16 +29,6 @@ jobs:
           # Script to create user
           # Assuming it's a placeholder
 
-  stage-4-reject:
-    if: failure() && github.event_name == 'workflow_dispatch'
-    needs: stage-3-create-user
-    runs-on: ubuntu-latest
-    steps:
-      - name: Reject User
-        run: |
-          # Script to reject user
-          # Assuming it's a placeholder
-
   stage-5-approve:
     if: success() && github.event_name == 'workflow_dispatch'
     needs: stage-3-create-user
@@ -60,6 +50,16 @@ jobs:
       - name: Handle Approval
         run: |
           # Script to handle approval
+          # Assuming it's a placeholder
+
+  stage-4-reject:
+    if: failure() && github.event_name == 'workflow_dispatch'
+    needs: [stage-6-handle-approval, stage-5-approve]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reject User
+        run: |
+          # Script to reject user
           # Assuming it's a placeholder
 
   stage-7-handle-rejection:
