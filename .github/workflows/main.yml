@@ -1,7 +1,7 @@
 name: Manual Approval Pipeline
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Triggered manually
 
 jobs:
   build:
