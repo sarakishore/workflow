@@ -47,9 +47,9 @@ jobs:
             }
 
   stage-4-reject:
-    if: failure()  # Potential issue here
     needs: [stage-3-create-user, manual-approval]
     runs-on: ubuntu-latest
+    if: failure()
     steps:
       - name: Reject User
         run: |
@@ -57,9 +57,9 @@ jobs:
           # Assuming it's a placeholder
 
   stage-5-approve:
-    if: success()
     needs: [stage-3-create-user, manual-approval]
     runs-on: ubuntu-latest
+    if: success()
     steps:
       - name: Approve User
         run: |
