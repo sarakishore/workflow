@@ -34,15 +34,7 @@ jobs:
     if: always()
     steps:
       - name: Manual Approval
-        with:
-          uses: "marvinpinto/action-automatic-releases@latest"
-          args: |
-            --token= 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
-            --yes
-            --publish
-            --repo= workflow
-            --tag= 1.0.1
-            --title="Manual Approval"
+        run: echo "Manual approval needed"
 
   stage-4-reject:
     if: failure()
