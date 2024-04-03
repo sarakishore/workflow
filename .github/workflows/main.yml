@@ -36,13 +36,14 @@ jobs:
         id: approval
         uses: "actions/github-script@v4"
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const response = await github.repos.createDeploymentStatus({
+            const response = await github.repos.createStatus({
               ...context.repo,
-              deployment_id: context.payload.deployment.id,
+              sha: context.sha,
               state: "pending",
               description: "Manual approval needed",
-              environment_url: "URL where the approval can be given"
+              target_url: "https://github.com/sarakishore"
             });
             console.log(response);
             return response;
