@@ -54,3 +54,12 @@ jobs:
         run: |
           # Script to reject user
           # Assuming it's a placeholder
+  stage-5-approve:
+    needs: [stage-3-create-user, manual-approval]
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Approve User
+        run: |
+          # Script to approve user
+          # Assuming it's a placeholder
