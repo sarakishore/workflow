@@ -21,10 +21,6 @@ jobs:
   stage-3-create-user:
     needs: stage-2-echo
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        approve-user: [false]
-      fail-fast: false
     steps:
       - name: Create User
         id: create-user
