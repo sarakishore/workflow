@@ -31,11 +31,21 @@ jobs:
   manual-approval:
     needs: stage-3-create-user
     runs-on: ubuntu-latest
-    if: always()
     steps:
       - name: Manual Approval
-        id: manual_approval
-        run: echo "Manual approval needed. Please approve or reject this user creation."
+        id: approval
+        uses: "actions/github-script@v4"
+        with:
+          script: |
+            const response = await github.repos.createDeploymentStatus({
+              ...context.repo,
+              deployment_id: context.payload.deployment.id,
+              state: "pending",
+              description: "Manual approval needed",
+              environment_url: "URL where the approval can be given"
+            });
+            console.log(response);
+            return response;
 
   stage-4-reject:
     if: failure()
