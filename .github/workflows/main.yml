@@ -34,7 +34,8 @@ jobs:
     if: always()
     steps:
       - name: Manual Approval
-        run: echo "Manual approval needed"
+        id: manual_approval
+        run: echo "Manual approval needed. Please approve or reject this user creation."
 
   stage-4-reject:
     if: failure()
