@@ -20,8 +20,8 @@ jobs:
         run: echo "Stage 2"
 
   stage-3-create-user:
-    needs: stage-2-echo
     runs-on: ubuntu-latest
+    needs: stage-2-echo
     steps:
       - name: Create User
         run: |
@@ -29,17 +29,22 @@ jobs:
           # Assuming it's a placeholder
 
   manual-approval:
-    needs: stage-3-create-user
     runs-on: ubuntu-latest
-    outputs:
-      approved: ${{ steps.approve.outputs.approved }}
+    needs: stage-3-create-user
     steps:
       - name: Manual Approval
-        id: approve
-        run: echo "::set-output name=approved::true" # Change to false to simulate disapproval
+        id: approval
+        run: echo "Please approve or reject user creation."
+      - name: Set Approval Output
+        if: steps.approval.outputs.return-value == 'approve'
+        run: echo "::set-output name=approval_status::approve"
+      - name: Set Rejection Output
+        if: steps.approval.outputs.return-value == 'reject'
+        run: echo "::set-output name=approval_status::reject"
 
   stage-4-reject:
-    if: ${{ needs.manual-approval.outputs.approved == 'false' }}
+    if: ${{ needs.manual-approval.outputs.approval_status == 'reject' }}
+    needs: manual-approval
     runs-on: ubuntu-latest
     steps:
       - name: Reject User
@@ -48,7 +53,8 @@ jobs:
           # Assuming it's a placeholder
 
   stage-5-approve:
-    if: ${{ needs.manual-approval.outputs.approved == 'true' }}
+    if: ${{ needs.manual-approval.outputs.approval_status == 'approve' }}
+    needs: manual-approval
     runs-on: ubuntu-latest
     steps:
       - name: Approve User
