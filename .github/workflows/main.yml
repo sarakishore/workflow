@@ -33,7 +33,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Manual Approval
-        id: approval
         uses: octokit/request-action@v2.x
         with:
           route: POST /repos/${{ github.repository }}/statuses/${{ github.sha }}
@@ -44,7 +43,7 @@ jobs:
               "state": "pending",
               "description": "Manual approval needed",
               "context": "manual-approval",
-              "target_url": "https://github.com/sarakishore"
+              "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             }
 
   stage-4-reject:
