@@ -22,11 +22,28 @@ jobs:
   stage-3-create-user:
     needs: stage-2-echo
     runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.approval == 'true' }}
     steps:
       - name: Create User
         run: |
-          # Script to create user
-          # Assuming it's a placeholder
+          #!/bin/bash
+
+          # Define your GitHub username and token
+          GITHUB_USERNAME="sarakishore"
+          GITHUB_TOKEN="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"
+
+          # Define the username you want to create
+          NEW_USERNAME="Ashok"
+
+          # Create the user using GitHub API
+          curl -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/admin/users \
+            -d "{\"login\":\"$NEW_USERNAME\"}"
+
+          # Print success message
+          echo "User $NEW_USERNAME created successfully."
 
   stage-4-reject:
     if: failure()
