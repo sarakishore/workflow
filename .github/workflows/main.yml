@@ -28,9 +28,25 @@ jobs:
           # Script to create user
           # Assuming it's a placeholder
 
+  manual-approval:
+    needs: stage-3-create-user
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Manual Approval
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          args: |
+            --token=${{ secrets.GITHUB_TOKEN }}
+            --yes
+            --publish
+            --repo=$GITHUB_REPOSITORY
+            --tag=v$VERSION
+            --title="Manual Approval"
+
   stage-4-reject:
     if: failure()
-    needs: stage-3-create-user
+    needs: [stage-3-create-user, manual-approval]
     runs-on: ubuntu-latest
     steps:
       - name: Reject User
@@ -40,7 +56,7 @@ jobs:
 
   stage-5-approve:
     if: success()
-    needs: stage-3-create-user
+    needs: [stage-3-create-user, manual-approval]
     runs-on: ubuntu-latest
     steps:
       - name: Approve User
