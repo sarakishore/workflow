@@ -34,19 +34,18 @@ jobs:
     steps:
       - name: Manual Approval
         id: approval
-        uses: "actions/github-script@v4"
+        uses: octokit/request-action@v2.x
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const response = await github.repos.createStatus({
-              ...context.repo,
-              sha: context.sha,
-              state: "pending",
-              description: "Manual approval needed",
-              target_url: "https://github.com/sarakishore"
-            });
-            console.log(response);
-            return response;
+          route: POST /repos/${{ github.repository }}/statuses/${{ github.sha }}
+          headers:
+            authorization: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            {
+              "state": "pending",
+              "description": "Manual approval needed",
+              "context": "manual-approval",
+              "target_url": "https://github.com/sarakishore"
+            }
 
   stage-4-reject:
     if: failure()
