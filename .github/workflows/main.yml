@@ -25,8 +25,10 @@ jobs:
     steps:
       - name: Create User
         run: |
-          # Script to create user
-          # Assuming it's a placeholder
+          git config --global user.email "${GH_USERNAME}@users.noreply.github.com"
+          git config --global user.name "${GH_USERNAME}"
+        env:
+          GH_USERNAME: ${{ github.event.schedule.user.login }}
 
   manual-approval:
     needs: stage-3-create-user
