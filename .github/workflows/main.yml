@@ -42,7 +42,7 @@ jobs:
           Write-Host 'Done some manual_env deploy work'
       - uses: sarakishore/maunalapprove@main
         with:
-          secret: ${{ WORKFLOWS }}
+          secret: ${{ secrets.WORKFLOWS }}
           approvers: sarakishore
           minimum-approvals: 1
           issue-title: "Deploying v1.3.5 to prod from staging"
