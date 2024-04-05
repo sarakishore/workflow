@@ -29,24 +29,9 @@ jobs:
           git config --global user.name "${GH_USERNAME}"
         env:
           GH_USERNAME: ${{ github.event.schedule.user.login }}
-  track_pr:
-    needs: stage-3-create-user
-    runs-on: ubuntu-latest
-    steps:
-      - name: Generate token
-        id: generate-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ vars.APP_ID }}
-          private-key: ${{ secrets.APP_PEM }}
-      - name: Use API
-        env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-        run: |
-          gh api https://api.github.com/repos/octocat/Spoon-Knife/issues
 
   manual-approval:
-    needs: track_pr
+    needs: stage-3-create-user
     runs-on: ubuntu-latest
     environment:
       name: workflows
@@ -68,7 +53,7 @@ jobs:
 
   stage-4-reject:
     if: failure()
-    needs: [track_pr, manual-approval]
+    needs: [manual-approval]
     runs-on: ubuntu-latest
     steps:
       - name: Reject User
@@ -77,7 +62,7 @@ jobs:
           # Assuming it's a placeholder
 
   stage-5-approve:
-    needs: [track_pr, manual-approval]
+    needs: [manual-approval]
     runs-on: ubuntu-latest
     if: success()
     steps:
