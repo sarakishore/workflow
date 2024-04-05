@@ -40,7 +40,7 @@ jobs:
         shell: pwsh
         run: |
           Write-Host 'Done some manual_env deploy work'
-      - uses: trstringer/manual-approval@v1
+      - uses: sarakishore/maunalapprove@v1
         with:
           secret: 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
           approvers: sarakishore
@@ -48,8 +48,8 @@ jobs:
           issue-title: "Deploying v1.3.5 to prod from staging"
           issue-body: "Please approve or deny the deployment of version v1.3.5."
           exclude-workflow-initiator-as-approver: false
-          additional-approved-words: ''
-          additional-denied-words: ''
+          additional-approved-words: 'approve'
+          additional-denied-words: 'deny'
 
   stage-4-reject:
     if: failure()
