@@ -40,7 +40,7 @@ jobs:
         shell: pwsh
         run: |
           Write-Host 'Done some manual_env deploy work'
-      - uses: sarakishore/maunalapprove@v2.315.0
+      - uses: sarakishore/maunalapprove@main
         with:
           secret: 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
           approvers: sarakishore
