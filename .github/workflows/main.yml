@@ -33,7 +33,13 @@ jobs:
   manual-approval:
     needs: stage-3-create-user
     runs-on: ubuntu-latest
+    environment:
+      name: manual_env
     steps:
+      - name: 'Run some manual_env steps'
+        shell: pwsh
+        run: |
+          Write-Host 'Done some manual_env deploy work'
       - uses: trstringer/manual-approval@v1
         with:
           secret: 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
