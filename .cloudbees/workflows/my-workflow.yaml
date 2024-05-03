@@ -1,17 +1,72 @@
-apiVersion: automation.cloudbees.io/v1alpha1
-kind: workflow
-name: My workflow
+name: User Approval Workflow
 
 on:
   push:
     branches:
-      - '**'
+      - main
 
 jobs:
-  build:
+  stage-1-echo:
+    runs-on: ubuntu-latest
     steps:
-      - name: Say hello
-        uses: docker://golang:1.20.3-alpine3.17
-        shell: sh
+      - name: Echo Stage 1
+        run: echo "Stage 1"
+
+  stage-2-echo:
+    needs: stage-1-echo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo Stage 2
+        run: echo "Stage 2"
+
+  stage-3-create-user:
+    needs: stage-2-echo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create User
         run: |
-          echo "hello world"
+          git config --global user.email "${GH_USERNAME}@users.noreply.github.com"
+          git config --global user.name "${GH_USERNAME}"
+        env:
+          GH_USERNAME: ${{ github.event.schedule.user.login }}
+
+  manual-approval:
+    needs: stage-3-create-user
+    runs-on: ubuntu-latest
+    environment:
+      name: workflows
+    steps:
+      - name: 'Run some manual_env steps'
+        shell: pwsh
+        run: |
+          Write-Host 'Done some manual_env deploy work'
+      - uses: sarakishore/maunalapprove@main
+        with:
+          secret: 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
+          approvers: sarakishore
+          minimum-approvals: 1
+          issue-title: "Deploying v1.3.5 to prod from staging"
+          issue-body: "Please approve or deny the deployment of version v1.3.5."
+          exclude-workflow-initiator-as-approver: false
+          additional-approved-words: 'approve'
+          additional-denied-words: 'deny'
+
+  stage-4-reject:
+    if: failure()
+    needs: [manual-approval]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reject User
+        run: |
+          # Script to reject user
+          # Assuming it's a placeholder
+
+  stage-5-approve:
+    needs: [manual-approval]
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Approve User
+        run: |
+          # Script to approve user
+          # Assuming it's a placeholder
